@@ -1,2 +1,3 @@
-# faithfulness
-Code for the paper "A Positive Case for Faithfulness: LLM Self-Explanations Help Predict Model Behavior"
+# A Positive Case for Faithfulness: LLM Self-Explanations Help Predict Model Behavior
+
+Code to be added soon.
