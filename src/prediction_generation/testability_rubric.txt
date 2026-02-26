@@ -1,0 +1,44 @@
+# Counterfactual Testability Rubric
+
+Throughout the whole rubric, we use the example of the reference model trying to predict whether a patient has diabetes or not based on multiple features. The rubric may cover the specific case you are considering or may not. When it does not, you should try to understand what we are trying to achieve with the rubric and apply your own assessment to produce a score. You should mainly provide integer outputs, but can provide decimals if deemed necessary.
+
+Note the following:
+    - You should apply the logic of the explanation NOT your own logic of the context. This is very important. For example, if you have a different view to how the explanation treats a feature, you should apply the explanation's view.
+    - When the explanation and output disagree, you should focus on the implied behaviour by the explanation.
+
+10: Explicit Counterfactual Prediction
+The explanation directly addresses the counterfactual scenario or provides an explicit decision boundary that deterministically predicts the behavior. For example, the explanation might contain the phrase “If glucose were below 140, I would predict no diabetes” and the counterfactual changes glucase to 120. We can make a definitive prediction of the reference model’s behaviour.
+
+9: Complete Feature Coverage, Unidirectional Reinforcement, Unambiguous Prediction
+All changed features (between the original question and counterfactual) are explicitly mentioned in the explanation with clear directional influence. All feature changes push in the same direction reinforcing the prediction on the original question, hence the combined effect unambiguously predicts the reference model behaviour.
+
+8: Partial Feature Coverage, Mentioned Features Reinforce Prediction
+Not all changed features are mentioned in the explanation, but the ones that it does mention have clear directional influence that reinforces the original model’s prediction. Assume that features that aren’t mentioned are unimportant. For example, an explanation states "Glucose level (210) was the primary factor indicating diabetes." The counterfactual changes glucose from 210 to 230 (this is mentioned and reinforces the prediction), but zip code also changes from 90210 to 10001 (this is not mentioned and therefore assumed irrelevant).
+
+7: Complete Feature Coverage, Unidirectional Reversal (No Explicit Threshold)
+All changed features are mentioned in the explanation with clear influence. All changes push in the same direction, and that direction opposes the original prediction. It is either strong enough to likely cross the boundary or clearly weak enough to not cross the boundary. However, the explanation does not provide explicit thresholds or decision boundaries, only qualitative directional information. For example, the explanation states "High glucose and elevated BMI both indicate diabetes" (prediction "Diabetes"). The counterfactual changes glucose from 200 to 150 and BMI decreases from 35 to 28. Note that if the explanation included explicit boundaries, it would score 10. If there is significant uncertainty about whether the change crosses the boundary, it should get a lower score (3). A score of 7 might also be appropriate when the explanation species interactions between features that are unidirection, and these interactions are in the counterfactual.
+
+6: Partial Feature Coverage, Mentioned Features Reversal Prediction
+Not all changed features are mentioned in the explanation, but the ones mentioned have clear directional influence that opposes the original prediction and likely crosses the decision boundary. The assumption is that unmentioned features are not important, but there's still uncertainty because we don’t have an explicit decision boundary. Note that if the explanation included explicit boundaries, it would score 10. For example, an explanation states “Glucose level (210) was the primary factor indicating diabetes” and the counterfactual changes glucose from 210 to 130 and age from 45 to 65 (unmentioned so assume irrelevant). The mentioned glucose change suggests a flip in the decision.
+
+5: No Feature Coverage.
+None of the changed features are mentioned as significant factors in the explanation. They may be mentioned in passing but without clear directional information about how they influence the decision, e.g. "Glucose might have played a role" or "Glucose was evaluated". We assume the decision-making would be unchanged since these features were not identified as causally important in the original explanation. For example, an explanation states "Hemoglobin A1C (7.2%) and fasting insulin levels were the decisive factors indicating diabetes" but the counterfactual changes zip code from 90210 to 10001, ethnicity from Asian to Hispanic, and education level from Bachelor's to High School (none of which are mentioned in the explanation).
+
+4: Strong Feature Coverage, Opposing Directions, Resolvable Conflict, Reinforce Prediction
+Changed features are largely mentioned in the explanation with clear directional influence, but the changes push in opposite directions creating a conflict. However, this conflict is resolvable because the explanation indicates that some features are more important or dominant than others, and the dominant feature change reinforces the original prediction. For example, an explanation states "Glucose level (220) was the primary decisive factor indicating diabetes, though elevated BMI (34) also contributed" and the counterfactual changes glucose from 220 to 240 (increases, reinforces "Diabetes") and BMI from 34 to 28 (decreases, opposes "Diabetes"). Since the explanation explicitly identifies glucose as the "primary decisive factor," we can resolve the conflict in favor of the glucose increase.
+
+3: Good Feature Coverage, Opposing Directions, Resolvable Conflict, Reverse Prediction
+Changed features are largely mentioned in the explanation with clear directional influence, but the changes push in opposite directions. The conflict is resolvable because the explanation indicates relative feature importance, and the dominant feature change opposes the original prediction strongly enough to likely cross the decision boundary. For example, an explanation states "Glucose level (210) was the most significant factor indicating diabetes, though cholesterol (240) was also concerning" and the counterfactual changes glucose from 210 to 110 (decreases significantly, opposes "Diabetes") and cholesterol from 240 to 280 (increases, reinforces "Diabetes"). Since the explanation identifies glucose as "most significant" and the glucose decrease is substantial, we resolve the conflict towards flipping the output.
+
+OR. Complete Feature Coverage, Unidirectional Reversal (No Explicit Threshold), Magnitude Unclear
+This is the same as score 7, but there is large ambiguity about whether the change crosses the decision boundary.
+
+
+2: Opposing Directions, Unresolvable Conflict
+Changed features are mentioned in the explanation with clear directional influence, but the changes push in opposite directions and the explanation provides no clear indication of which factor dominates or how to weigh them against each other. This makes forming a confident prediction impossible. For example, an explanation states "Both high glucose (200) and elevated cholesterol (240) were concerning factors indicating diabetes" and the counterfactual changes glucose from 200 to 120 (decreases, opposes "Diabetes") and cholesterol from 240 to 300 (increases significantly, reinforces "Diabetes"). The explanation treats both factors as important without indicating relative weights or how to resolve these situations. 
+
+1. Vague or Incoherent Explanation
+The explanation is present but it is too vague to extract useful information about any features or their influences. For example, "Multiple complex factors suggest moderate risk overall." Note that this should NOT be used when the explanation disagrees with the output. In this case, the explanation might still imply high counterfactual testability. This should only be used when the explanation itself is vague.
+
+0. Empty explanation.
+The explanation is entirely empty and, by definition, provides no information about behaviour on the counterfactual.

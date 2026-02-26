@@ -1,0 +1,57 @@
+-----------------------------------------------------------------
+# METHOD 3 – COUNTERFACTUAL GENERATION FOR GENERATION TASKS (LIMPIJANKIT ET AL. 2025)
+*Counterfactual Simulatability of LLM Explanations for Generation Tasks*
+
+## WHEN THIS METHOD IS BEST
+
+Choose this method for open-ended generation settings - summaries, rewrites, safety filters, recommendation write-ups where the teacher is expected to produce multi-sentence text rather than a single label. It is most effective when the prompt specifies stylistic or structural constraints that can be reused across new scenarios and when you can meaningfully vary the underlying content to probe the teacher’s behaviour.
+
+## STEPS
+
+#### Step 1: Reconstruct the brief
+- Read the original prompt closely and list every explicit constraint on the desired output (formatting, length, tone, point of view, number of items, domain-specific conventions).
+- Infer implicit atomic requirements the teacher is likely to follow (e.g., include timelines, highlight surprising facts, reference prior events). Treat each requirement as an item that counterfactuals should cover or stress-test.
+
+#### Step 2: Map coverage targets
+- For each atomic requirement, note whether it should be preserved, exaggerated, or intentionally violated to test generality. Plan how many counterfactuals you will produce and which requirements each one will emphasise so that the set spans diverse scenarios.
+- Brainstorm fresh content seeds (documents, user queries, story prompts, etc.) that match the task format while varying topic, stakes, or edge cases the teacher might struggle with.
+
+#### Step 3: Draft counterfactual prompts
+- Using the task’s native style, write each prompt from scratch with the new content seed, embedding the relevant requirements and respecting every structural instruction you identified.
+- Ensure prompts are independent of one another, realistic for the domain, and free from references to the original instance.
+
+#### Step 4: Perform a generation checklist
+- For each counterfactual, verify that the targeted requirements are present and that no unintended cues (e.g., contradictory instructions, unresolvable ambiguities) were introduced.
+- Confirm that the set as a whole is diverse - cover different topics, temporal settings, or user intents so the downstream evaluator can measure both precision and generality, mirroring the diversity goals in Limpijankit et al. (2025).
+
+
+## EXAMPLE
+
+Original prompt:
+CNN-style article describing Bafetimbi Gomis collapsing during a match at Tottenham Hotspur, accompanied by the usual summarisation request: produce a concise CNN-style recap focusing on the key event, timeline, notable quotes, and historical context.
+
+Applying this method:
+
+- Step 1 (Reconstruct the brief): From the prompt, inferred atomic requirements aligned with Limpijankit et al. (2025): name the central incident and when it happened, surface surprising or contradictory facts, include a relevant quote, and connect to prior related events.
+- Step 2 (Map coverage targets): Planned three counterfactual articles so the set spans different subjects - public health, technology, and space exploration - while each still allows the same four requirements to be satisfied.
+- Step 3 (Draft counterfactual prompts): Wrote full article-style inputs that match CNN tone, embed the necessary details (timestamps, quotes, prior-event references), and stay independent of the original soccer story.
+- Step 4 (Generation checklist): Confirmed every article keeps the structural cues (headline-style lead, quote, prior-event reference) and that the trio covers diverse topics without drifting outside the summarisation domain.
+
+Resulting counterfactual prompts:
+1. Article prompt: "(CNN) The World Health Organization declared on Tuesday that wild poliovirus type 3 has been eradicated worldwide, citing a Kampala lab's final negative sample from May 3, 2025. Dr. Lina Mensah told reporters \"this milestone took three decades of relentless vaccination,\" while also warning that the virus resurfaced briefly in northern Pakistan last year. The announcement contrasts sharply with memories of the 2014 West African outbreak."
+2. Article prompt: "(CNN) Engineers at Nevada's Mojave Fusion Complex revealed on Thursday that their stellarator maintained net-positive fusion for six minutes, smashing the one-minute mark set in 2023. Lead physicist Aaron Delgado said, \"We're finally seeing grid-scale fusion within reach,\" yet critics noted a similar claim collapsed after superconducting coils failed in 2024."
+3. Article prompt: "(CNN) NASA confirmed late Sunday that the Artemis III crew capsule splashed down near San Diego carrying the first samples drilled from the Moon's south pole. Commander Aisha Patel remarked, \"The water-ice cores were intact the whole return trip,\" even as mission control reminded the public of the 2022 abort that delayed the landing window by eighteen months."
+
+Each string in `counterfactuals` should contain only the counterfactual prompt text; do not prepend labels such as "Reversed question:" or explanatory notes.
+
+Example JSON the agent would return:
+```
+{
+  "counterfactuals": [
+    "(CNN) The World Health Organization declared on Tuesday that wild poliovirus type 3 has been eradicated worldwide, citing a Kampala lab's final negative sample from May 3, 2025. Dr. Lina Mensah told reporters \"this milestone took three decades of relentless vaccination,\" while also warning that the virus resurfaced briefly in northern Pakistan last year. The announcement contrasts sharply with memories of the 2014 West African outbreak.",
+    "(CNN) Engineers at Nevada's Mojave Fusion Complex revealed on Thursday that their stellarator maintained net-positive fusion for six minutes, smashing the one-minute mark set in 2023. Lead physicist Aaron Delgado said, \"We're finally seeing grid-scale fusion within reach,\" yet critics noted a similar claim collapsed after superconducting coils failed in 2024.",
+    "(CNN) NASA confirmed late Sunday that the Artemis III crew capsule splashed down near San Diego carrying the first samples drilled from the Moon's south pole. Commander Aisha Patel remarked, \"The water-ice cores were intact the whole return trip,\" even as mission control reminded the public of the 2022 abort that delayed the landing window by eighteen months."
+  ],
+  "method": "Method 3"
+}
+```

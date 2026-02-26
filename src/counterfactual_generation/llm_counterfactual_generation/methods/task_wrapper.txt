@@ -1,0 +1,19 @@
+-----------------------------------------------------------------
+FINAL INSTRUCTIONS
+
+You have just read the counterfactual generator task brief followed by four available generation methods. (i) internalise the overall task constraints, (ii) pick exactly one method whose assumptions match the original prompt, and (iii) execute that method step by step without mixing in steps from the others.
+
+SUMMARY: Respond with a JSON object containing exactly {n_counterfactuals} counterfactual prompts, the method identifier, and every method-specific key.
+
+-----------------------------------------------------------------
+OUTPUT REQUIREMENTS
+
+Return nothing except a single JSON object. It must include, at minimum, the following keys:
+- `counterfactuals`: a list of fully written counterfactual prompts; this list must contain exactly {n_counterfactuals} entries.
+- `method`: the string identifier of the method you selected (e.g., `"Method 2"`).
+Add any extra keys mandated by the method you followed (e.g., `concepts` and `concept_values` for Method 1). Every entry in `counterfactuals` must be the bare counterfactual prompt text—no labels or commentary.
+
+No commentary, headers, or extra text should appear outside this JSON.
+
+-----------------------------------------------------------------
+ORIGINAL PROMPT

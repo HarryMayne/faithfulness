@@ -1,0 +1,63 @@
+-----------------------------------------------------------------
+# METHOD 2 – COUNTERFACTUAL GENERATION THROUGH BASIC PROMPTING (CHEN ET AL. 2024)
+*Do Models Explain Themselves? Counterfactual Simulatability of Natural Language Explanations*
+
+## WHEN THIS METHOD IS BEST
+
+Use this approach for questions with rich natural language structure (dialogues, preference judgements, question-answering with rationales) where the reference model's behaviour likely depends on a storyline or qualitative criteria rather than a small set of discrete attributes. This method is especially useful if you can predict how the reference model might behave and craft counterfactuals that test the implied explanation.
+
+## STEPS
+
+#### Step 1: Pattern distillation
+- Parse the original question to understand its template (sections, speaker roles, option format, answer type) and list several plausible rationales a reference model might apply. Include rationales that could be partially incorrect or mutually incompatible. The goal is to cover potential decision spaces a reference model may inhabit.
+- Summarise each potential rationale in one or two bullet points to anchor the counterfactual design (e.g., "prefer responses that acknowledge user safety" or "select the statement supported by both premises").
+
+#### Step 2: Scenario planning
+- Sketch a new scenario that mirrors the template: decide on fresh characters, contexts, or question stems that let one of the candidate rationales decide the outcome.
+- Ensure any answer choices or expected outputs remain unambiguous so that the downstream evaluator can judge whether the teacher should preserve or change its prediction.
+
+#### Step 3: Counterfactual drafting
+- Write the full counterfactual prompt using the task’s native style, weaving in the new details while keeping the decisive evidence aligned with the selected rationale.
+- Highlight (internally, not in the counterfactual) which option or answer each rationale would favour, and verify that the reasoning path mirrors the original logic rather than surface artefacts.
+
+#### Step 4: Quality check
+- Re-read the counterfactual to confirm it is coherent and grammatically sound.
+- Confirm that the rationales considered truly carry over: small edits should not accidentally introduce shortcuts or contradictory cues that would flip the answer for reasons unrelated to the intended test.
+
+## EXAMPLE
+
+Original prompt:
+Question: "Is it hard to get a BLT in Casablanca?" (binary answer expected).
+
+Applying this method:
+
+**Step 1 (Pattern distillation):** 
+
+Noted the yes/no question template and proposed two rationales the teacher might use: (a) pork is restricted in Muslim-majority countries, so bacon-based sandwiches are scarce; (b) Casablanca is a large international city, so tourist venues might still offer BLTs despite cultural norms.
+
+
+**Step 2 (Scenario planning):**
+
+Design one counterfactual that keeps the pork-availability rationale decisive and another that stresses the "international city" rationale by placing the sandwich request in an expat-friendly venue.
+
+**Step 3 (Counterfactual drafting):** Write each counterfactual in the same yes/no format, swapping the surface details while keeping the rationale under test clear.
+
+**Step 4 (Quality check):**
+Confirmed both questions are unambiguous, self-contained, and do not accidentally introduce new cues (e.g., guaranteeing availability).
+
+Resulting counterfactual prompts:
+1. Question: "Is it hard to find pork belly in Casablanca's open-air markets?"
+2. Question: "Is it hard to order a BLT at a Western-style hotel buffet in Casablanca?"
+
+Each string in `counterfactuals` should contain only the counterfactual prompt text; do not prepend labels such as "Reversed question:" or explanatory notes.
+
+Example JSON the agent would return:
+```
+{
+  "counterfactuals": [
+    "Question: Is it hard to find pork belly in Casablanca's open-air markets?",
+    "Question: Is it hard to order a BLT at a Western-style hotel buffet in Casablanca?"
+  ],
+  "method": "Method 2"
+}
+```
