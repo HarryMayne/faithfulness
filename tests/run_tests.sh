@@ -10,7 +10,7 @@
 CUDA_VISIBLE_DEVICES="1,2"
 export CUDA_VISIBLE_DEVICES="1,2"
 
-export OPENROUTER_API_KEY="REDACTED_KEY"
+export OPENROUTER_API_KEY="${OPENROUTER_API_KEY:?Set OPENROUTER_API_KEY in your environment or .env file}"
 
 # run the entire tabular data generator and store to test_outputs (will create parquets). Then make a small sample using the utils function.
 #python -m src.counterfactual_generation.tabular_counterfactual_generation.tabular_to_text --output_dir tests/test_outputs
